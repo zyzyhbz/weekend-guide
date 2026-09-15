@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FF6B4A">
+<title>周末去哪儿 · 城市探索指南</title>
+<meta name="description" content="根据你的偏好、天气、预算和同行人数，生成可直接执行的周末城市探索方案：推荐活动、组队出发、打卡记录、攻略分享。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ============================ 顶部栏 ============================ -->
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="#" data-nav="explore">
+      <span class="brand-mark">🧭</span>
+      <span class="brand-txt">
+        <b>周末去哪儿</b>
+        <i>城市探索指南</i>
+      </span>
+    </a>
+
+    <div class="topbar-right">
+      <button class="city-btn" id="cityBtn" aria-haspopup="listbox">
+        <span class="pin">📍</span><span id="cityLabel">深圳</span>
+        <svg viewBox="0 0 12 8" class="chev"><path d="M1 1l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+      <button class="ghost-btn" id="aboutBtn" title="产品设计说明">产品设计</button>
+    </div>
+  </div>
+  <div class="city-sheet" id="citySheet" hidden>
+    <div class="wrap city-grid" id="cityGrid"></div>
+  </div>
+</header>
+
+<!-- ============================ 探索视图 ============================ -->
+<main id="view-explore" class="view">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="wrap">
+      <h1>这个周末，<span class="hl">去哪儿</span>？</h1>
+      <p class="hero-sub">不用再翻 5 个 App、问 3 个群。<br>告诉我们你的偏好、预算和几个人，直接给你一份能照着走的方案。</p>
+
+      <div class="hero-cta">
+        <button class="primary-btn" id="heroGen">✨ 生成我的周末方案</button>
+        <button class="ghost-btn" id="heroDemo">先看一个示例 →</button>
+      </div>
+
+      <!-- 天气条 -->
+      <div class="weather-bar" id="weatherBar">
+        <div class="w-skeleton">正在获取天气…</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 偏好面板 -->
+  <section class="panel wrap" id="prefPanel">
+    <div class="panel-head">
+      <h2>1 · 说说你想怎么过</h2>
+      <button class="link-btn" id="togglePref">收起</button>
+    </div>
+
+    <div class="panel-body" id="prefBody">
+
+      <div class="field">
+        <label>时间窗</label>
+        <div class="chip-row" id="timeRow"></div>
+      </div>
+
+      <div class="field">
+        <label>氛围偏好 <span class="hint">可多选，选得越准推荐越准</span></label>
+        <div class="chip-row wrap-row" id="vibeRow"></div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>人均预算 <b class="val" id="budgetVal">¥200</b></label>
+          <input type="range" id="budgetRange" min="0" max="800" step="20" value="200">
+          <div class="range-scale"><span>白嫖</span><span>¥400</span><span>¥800</span></div>
+        </div>
+
+        <div class="field">
+          <label>同行人数</label>
+          <div class="stepper">
+            <button data-party="-1">−</button>
+            <b id="partyVal">2 人</b>
+            <button data-party="1">+</button>
+          </div>
+          <div class="hint" id="partyHint">2 人 · 适合结伴但不挤</div>
+        </div>
+
+        <div class="field">
+          <label>可接受单程 <b class="val" id="distVal">60 km</b></label>
+          <input type="range" id="distRange" min="10" max="120" step="10" value="60">
+          <div class="range-scale"><span>就在附近</span><span>全城</span></div>
+        </div>
+      </div>
+
+      <div class="panel-actions">
+        <button class="primary-btn" id="genBtn">
+          <span class="spark">✨</span> 生成我的周末方案
+        </button>
+        <button class="ghost-btn" id="resetBtn">重置</button>
+      </div>
+    </div>
+
+    <!-- 生成后的紧凑摘要条 -->
+    <div class="pref-summary" id="prefSummary" hidden></div>
+  </section>
+
+  <!-- 结果 -->
+  <section class="wrap results" id="results"></section>
+
+  <!-- 为什么是这几个 -->
+  <section class="wrap why" id="whyBox" hidden></section>
+
+  <!-- 功能导览 -->
+  <section class="wrap feature-entry">
+    <h2>方案定了，接下来</h2>
+    <div class="feature-grid">
+      <button class="feat" data-nav="team">
+        <span class="feat-ic">👥</span>
+        <b>组队出发</b>
+        <i>一键复制招募文案，丢进群里凑人</i>
+      </button>
+      <button class="feat" data-nav="checkin">
+        <span class="feat-ic">📌</span>
+        <b>打卡记录</b>
+        <i>去过哪些地方，攒成你的城市探索地图</i>
+      </button>
+      <button class="feat" data-nav="guide">
+        <span class="feat-ic">📝</span>
+        <b>攻略分享</b>
+        <i>把踩过的坑写下来，帮下一个周末的人</i>
+      </button>
+    </div>
+  </section>
+</main>
+
+<!-- ============================ 组队视图 ============================ -->
+<main id="view-team" class="view" hidden>
+  <div class="wrap page">
+    <h1 class="page-title">👥 组队出发</h1>
+    <p class="page-sub">周末最大的不确定性不是去哪，而是<strong>能不能凑齐人</strong>。这里把"发起—凑人—成行"的门槛压到最低。</p>
+
+    <div class="two-col">
+      <div class="card">
+        <h3>发起一个组队</h3>
+        <div class="field">
+          <label>关联方案</label>
+          <select id="teamPlanSel"></select>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>目标人数</label>
+            <input type="number" id="teamSize" value="4" min="2" max="20">
+          </div>
+          <div class="field">
+            <label>集合时间</label>
+            <input type="text" id="teamTime" value="周六 10:00" placeholder="如 周六 10:00">
+          </div>
+        </div>
+        <div class="field">
+          <label>补充说明</label>
+          <input type="text" id="teamNote" placeholder="如：欢迎社恐，全程不尬聊 / 需要会骑车">
+        </div>
+        <button class="primary-btn full" id="createTeam">生成招募卡并复制文案</button>
+      </div>
+
+      <div class="card">
+        <h3>进行中的组队</h3>
+        <div id="teamList" class="team-list"></div>
+      </div>
+    </div>
+
+    <div class="card" id="teamShareCard" hidden>
+      <h3>招募文案（已复制到剪贴板）</h3>
+      <pre class="share-preview" id="teamShareText"></pre>
+      <div class="row-actions">
+        <button class="ghost-btn" id="copyTeamAgain">再复制一次</button>
+        <button class="ghost-btn" id="downloadTeamCard">下载招募卡</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ============================ 打卡视图 ============================ -->
+<main id="view-checkin" class="view" hidden>
+  <div class="wrap page">
+    <h1 class="page-title">📌 打卡记录</h1>
+    <p class="page-sub">推荐只解决"去不去"，打卡解决"值不值"。每一次出行都沉淀成数据，反过来让下一次推荐更准。</p>
+
+    <div class="stat-grid" id="ckStats"></div>
+
+    <div class="card">
+      <h3>添加一次打卡</h3>
+      <div class="field-row">
+        <div class="field">
+          <label>活动</label>
+          <select id="ckAct"></select>
+        </div>
+        <div class="field">
+          <label>日期</label>
+          <input type="date" id="ckDate">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>实际人均花费 ¥</label>
+          <input type="number" id="ckCost" value="100" min="0">
+        </div>
+        <div class="field">
+          <label>实际耗时 h</label>
+          <input type="number" id="ckDur" value="3" min="0.5" step="0.5">
+        </div>
+      </div>
+      <div class="field">
+        <label>评分</label>
+        <div class="star-row" id="ckStars"></div>
+      </div>
+      <div class="field">
+        <label>一句话感受</label>
+        <input type="text" id="ckNote" placeholder="如：人比想象中少，四点半的光最好">
+      </div>
+      <button class="primary-btn full" id="addCheckin">记下这次</button>
+    </div>
+
+    <div class="card">
+      <h3>我的足迹</h3>
+      <div id="ckList" class="ck-list"></div>
+    </div>
+  </div>
+</main>
+
+<!-- ============================ 攻略视图 ============================ -->
+<main id="view-guide" class="view" hidden>
+  <div class="wrap page">
+    <h1 class="page-title">📝 攻略分享</h1>
+    <p class="page-sub">官方信息只告诉你"有什么"，真实攻略告诉你"几点去、值不值、坑在哪"。这里是最短路径。</p>
+
+    <div class="tabs" id="guideTabs"></div>
+    <div id="guideList" class="guide-list"></div>
+  </div>
+</main>
+
+<!-- ============================ 产品设计视图 ============================ -->
+<main id="view-about" class="view" hidden>
+  <div class="wrap page">
+    <h1 class="page-title">产品设计说明</h1>
+    <p class="page-sub">这是附加题的作答主体：<strong>为什么这么设计</strong>，比"做了什么"更重要。</p>
+    <div id="aboutBody"></div>
+  </div>
+</main>
+
+<!-- ============================ 底部导航 ============================ -->
+<nav class="tabbar">
+  <div class="wrap tabbar-in">
+    <button class="tab active" data-nav="explore"><span>🧭</span>探索</button>
+    <button class="tab" data-nav="team"><span>👥</span>组队</button>
+    <button class="tab" data-nav="checkin"><span>📌</span>打卡</button>
+    <button class="tab" data-nav="guide"><span>📝</span>攻略</button>
+    <button class="tab" data-nav="about"><span>💡</span>设计</button>
+  </div>
+</nav>
+
+<div class="toast" id="toast" hidden></div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
